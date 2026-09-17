@@ -16,6 +16,6 @@ in
 {
   hardware.firmware = [
     firmware
-    pkgs.raspberrypifw
+    pkgs.raspberrypiWirelessFirmware
   ];
 }

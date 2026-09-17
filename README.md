@@ -42,7 +42,8 @@ replaced by that project's module later without renaming anything.
 - `hardware.deviceTree.filter` and `hardware.deviceTree.name` for
   `rk3399-rock-pi-4b-plus.dtb`
 - `hardware.firmware` for the AW-NB197SM NVRAM and Bluetooth firmware, and for
-  the Raspberry Pi firmware package that supplies the generic brcmfmac files
+  the Raspberry Pi wireless firmware package that supplies the generic brcmfmac
+  files
 - `boot.supportedFilesystems.zfs = false`, because the Rockchip kernel provides
   no ZFS module
 
