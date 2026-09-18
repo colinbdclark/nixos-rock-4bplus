@@ -39,6 +39,13 @@
         kernelPackages = rockchip.legacyPackages.${boardSystem}.kernel_linux_latest_rockchip_stable;
       };
 
+      substituters = {
+        extra-substituters = [ "https://nabam-nixos-rockchip.cachix.org" ];
+        extra-trusted-public-keys = [
+          "nabam-nixos-rockchip.cachix.org-1:BQDltcnV8GS/G86tdvjLwLFz1WeFqSk7O9yl+DR0AVM="
+        ];
+      };
+
       toBytes =
         value:
         let
@@ -150,7 +157,12 @@
         ];
       };
 
-      nixosModules.sd-image = rockchip.nixosModules.sdImageRockchip;
+      nixosModules.sd-image =
+        { config, ... }:
+        {
+          imports = [ rockchip.nixosModules.sdImageRockchip ];
+          rockchip.uBoot = lib.mkDefault config.hardware.rockchip.platformFirmware;
+        };
 
       packages = forAllSystems (
         system:
@@ -161,7 +173,7 @@
 
       lib = {
         inherit (board) uboot firmwareOffset rootStart;
-        inherit provision flakeInputPaths;
+        inherit provision flakeInputPaths substituters;
       };
 
       nixosConfigurations.example = lib.nixosSystem {

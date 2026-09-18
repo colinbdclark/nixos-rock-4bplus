@@ -167,7 +167,7 @@ class ProvisionTests(unittest.TestCase):
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertNotIn("--extra-files", events[0])
-                self.assertIn("will not reach the installed system", result.stderr)
+                self.assertIn("will not be installed", result.stderr)
 
     def test_write_failure_prevents_verification(self):
         result, events = self.run_script('main provision /dev/target', env={"DD_STATUS": "1"})

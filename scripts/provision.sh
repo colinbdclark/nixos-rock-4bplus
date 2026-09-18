@@ -96,7 +96,7 @@ collect_extra_args() {
     if [ -s "$file" ]; then
       extra_args+=(--extra-files "$file" "$file")
     else
-      echo "warning: $file is missing or empty and will not reach the installed system" >&2
+      echo "warning: $file is missing or empty and will not be installed" >&2
     fi
   done
 }

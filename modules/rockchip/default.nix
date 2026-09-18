@@ -31,32 +31,12 @@ in
       default = "16M";
       description = "Start of the first partition. The default leaves room for U-Boot in front of it.";
     };
-
-    zfsStub = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Replace the zfs package with commands that fail. Installation paths that reach for zfs need this, because the Rockchip kernel provides no ZFS module.";
-    };
   };
 
-  config =
-    lib.mkIf cfg.enable {
-      boot.kernelParams = lib.mkBefore [
-        "console=tty0"
-        "console=ttyS2,1500000n8"
-      ];
-    }
-    // lib.mkIf cfg.zfsStub {
-      nixpkgs.overlays = [
-        (_final: super: {
-          zfs = super.runCommandLocal "zfs-unavailable" { } ''
-            mkdir -p $out/bin
-            for command in zfs zpool zdb; do
-              printf '#!${super.runtimeShell}\necho "zfs is not available on this system" >&2\nexit 1\n' > $out/bin/$command
-              chmod +x $out/bin/$command
-            done
-          '';
-        })
-      ];
-    };
+  config = lib.mkIf cfg.enable {
+    boot.kernelParams = lib.mkBefore [
+      "console=tty0"
+      "console=ttyS2,1500000n8"
+    ];
+  };
 }

@@ -24,7 +24,7 @@ inputs.rock-4bplus.inputs.nixpkgs.follows = "nixpkgs";
 | --- | --- |
 | `nixosModules.radxa-rock-pi-4b-plus` | SoC and board support |
 | `nixosModules.radxa-rock-pi-4b-plus-disk` | eMMC layout for installation, optional (import the board module with it) |
-| `nixosModules.sd-image` | SD card image support, from the pinned Rockchip input |
+| `nixosModules.sd-image` | SD card image, with the U-Boot package defaulted from `hardware.rockchip.platformFirmware` |
 
 The modules receive a `board` argument holding the U-Boot package, the firmware offset and the root partition start. The input does not read the consumer's `inputs` by name.
 
@@ -70,11 +70,8 @@ The kernel comes from the Rockchip input rather than the consumer's nixpkgs.
 | `hardware.rockchip.platformFirmware` | package or null | `null` | U-Boot package |
 | `hardware.rockchip.firmwareOffset` | int, bytes | `32768` | Offset for the raw U-Boot write |
 | `hardware.rockchip.rootStart` | string | `"16M"` | Start of the first partition |
-| `hardware.rockchip.zfsStub` | bool | `false` | Replace `pkgs.zfs` with failing stubs |
 
 `firmwareOffset` and `rootStart` are the single source of truth for the disko layout and the installer. The 16 MiB start leaves room for U-Boot in front of the first partition.
-
-`zfsStub` is off by default. It can only be enabled when the Rockchip kernel provides ZFS support, which it doesn't currently do.
 
 ## Packages
 
@@ -113,9 +110,19 @@ board.lib.flakeInputPaths self
 ```
 
 Returns the store paths of a flake and its inputs, recursively and deduplicated.
-The consuming flake passes the result to the SD image through
-`system.extraDependencies`, which lets the installer evaluate the configuration
-with no network access.
+The consuming flake copies the result to a board, so the board can evaluate the
+configuration without fetching the flake's inputs.
+
+### `lib.substituters`
+
+```nix
+board.lib.substituters
+```
+
+Holds `extra-substituters` and `extra-trusted-public-keys` for the Rockchip
+binary cache. A consumer applies it to the boards' `nix.settings`. Its own
+`nixConfig` repeats the values, because Nix does not apply the `nixConfig` of a
+flake input.
 
 ## What this flake does not do
 
