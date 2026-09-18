@@ -110,6 +110,21 @@
         in
         flake: lib.unique (collect flake);
 
+      provisionPayload =
+        {
+          pkgs,
+          flake,
+          config,
+          toplevel,
+          provisioner,
+        }:
+        pkgs.linkFarm "provision-payload-${config}" (
+          map (path: {
+            name = builtins.unsafeDiscardStringContext (baseNameOf (toString path));
+            path = path;
+          }) ([ toplevel ] ++ flakeInputPaths flake ++ [ provisioner ])
+        );
+
       formatCheck =
         system:
         (pkgsFor system).runCommand "check-format"
@@ -173,7 +188,12 @@
 
       lib = {
         inherit (board) uboot firmwareOffset rootStart;
-        inherit provision flakeInputPaths substituters;
+        inherit
+          provision
+          provisionPayload
+          flakeInputPaths
+          substituters
+          ;
       };
 
       nixosConfigurations.example = lib.nixosSystem {

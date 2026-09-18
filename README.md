@@ -103,6 +103,26 @@ The consumer passes its own flake path. The helper never uses its own `self`:
 inside this flake that path is the board support source, and an installer built
 from it would install the wrong configuration.
 
+### `lib.provisionPayload`
+
+```nix
+board.lib.provisionPayload {
+  inherit pkgs;
+  flake = self;           # the consuming flake, for collecting its inputs
+  config = "rock";        # configuration name
+  toplevel = ...;         # the system to install
+  provisioner = ...;      # the installer from lib.provision
+}
+```
+
+Returns a linkFarm named `provision-payload-<config>` holding the system, the
+flake's inputs and the installer. `just provision-emmc` copies it to a board
+before installing.
+
+`flake` here is the flake itself, because the helper collects its inputs.
+`lib.provision` takes the flake's store path instead, because it embeds that path
+in the installer.
+
 ### `lib.flakeInputPaths`
 
 ```nix
